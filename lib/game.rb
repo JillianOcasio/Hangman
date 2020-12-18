@@ -52,18 +52,17 @@ require_relative './save_game.rb'
 
 
     def rearrange_Board(letter_spots, guess_letter, word_blanks)
-        new_board=""
+        word_blanks=word_blanks.split(' ')
         i=0 
         while i<@word_length 
             if letter_spots.include?(i)
-                new_board.concat(guess_letter)
+                word_blanks[i]=guess_letter
                 i+=1
             else 
-                new_board.concat("_ ")
                 i+=1
             end 
         end 
-        return new_board
+        return word_blanks.join(' ')
     end 
     
     def play_game()
@@ -90,18 +89,22 @@ require_relative './save_game.rb'
                 @guesses+=1
                 save_game()
             else 
-                letter_spots = compare_letter(guess_letter)
                 guess_list.push(guess_letter)
-                puts letter_spots
-                word_blanks=rearrange_Board(letter_spots, guess_letter, word_blanks)
-                puts word_blanks
-                if win?(word_blanks)
-                    puts "You won!"
-                elsif guesses==0 
+                if @secret_list.include?(guess_letter)
+                    letter_spots = compare_letter(guess_letter)
+                    word_blanks=rearrange_Board(letter_spots, guess_letter, word_blanks)
+                    puts word_blanks
+                    if win?(word_blanks)
+                        puts "You won!"
+                        break
+                    elsif @guesses==0 
+                        puts "You lose!"
+                    end 
+                elsif @guesses==0 
                     puts "You lose!"
-                end 
-            end 
+            end  
         end
+    end 
     end 
 
     def open_game()
@@ -110,15 +113,14 @@ require_relative './save_game.rb'
 
         
     def compare_letter(guess_letter)
-        if @secret_list.include? (guess_letter)
-            return @secret_list.each_index.select { |index| @secret_list[index] == guess_letter}  
-        end 
+        return @secret_list.each_index.select { |index| @secret_list[index] == guess_letter}  
     end 
+     
 
     def win?(word_blanks)
         if word_blanks.include? ("_")
             return false 
-        elsif word_blanks.match? /\A[a-zA-Z'-]*\z/
+        else 
             return true 
         end 
     end
