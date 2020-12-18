@@ -1,14 +1,22 @@
+require 'erb'
+require 'yaml'
+require_relative './save_game.rb'
+
 
  LINES=File.readlines "5desk.txt" 
 
  class Game 
-    attr_reader :guesses, :secret_word, :secret_list, :word_length
+    include Serialize
+    
+    attr_reader :guesses, :secret_word, :secret_list, :word_length, :word_blanks, :guess_list
 
     def initialize()
-        @guesses=1
+        @guesses=10
         @secret_word=secret_word
         @secret_list=secret_list
         @word_length = word_length
+        @word_blanks=word_blanks 
+        @guess_list=guess_list
     end 
     
     def select_word()
@@ -19,7 +27,7 @@
     def askPlayer()
         "Would you like to play a new game?"
     end 
-
+    
     
     def game_Display()
         @secret_word=select_word()
@@ -58,17 +66,32 @@
         return new_board
     end 
     
-    def round_of_guess()
-        word_blanks=game_Display()
+    def play_game()
+        @guess_list=[]
+        puts "Would you like to open a saved game?"
+        response=gets.chomp.downcase
+        if response == "yes"|| response == "y"|| response == "Y"
+            open_game()
+            round_of_guess(word_blanks)
+        else    
+            word_blanks=game_Display()
+            round_of_guess(word_blanks)
+        end  
+    end 
+
+    def round_of_guess(word_blanks)
         while @guesses > 0
             @guesses-=1
-            puts "Please enter a letter or the word save (to save your progress)"
+            puts "Please enter a letter or the word save (to save your progress and return later)"
             puts word_blanks
             guess_letter=gets.chomp.downcase
             if guess_letter=="save"
-                puts"save"
+                puts "The file is saved!"
+                @guesses+=1
+                save_game()
             else 
                 letter_spots = compare_letter(guess_letter)
+                guess_list.push(guess_letter)
                 puts letter_spots
                 word_blanks=rearrange_Board(letter_spots, guess_letter, word_blanks)
                 puts word_blanks
@@ -77,14 +100,18 @@
                 elsif guesses==0 
                     puts "You lose!"
                 end 
-            end
-        end 
+            end 
+        end
     end 
 
+    def open_game()
+        deserialize()
+    end 
+
+        
     def compare_letter(guess_letter)
         if @secret_list.include? (guess_letter)
-            return @secret_list.each_index.select { |index| @secret_list[index] == guess_letter} 
-        else 
+            return @secret_list.each_index.select { |index| @secret_list[index] == guess_letter}  
         end 
     end 
 
@@ -94,9 +121,9 @@
         elsif word_blanks.match? /\A[a-zA-Z'-]*\z/
             return true 
         end 
-    end 
-  
+    end
 end 
+     
 
 game=Game.new()
-game.round_of_guess()
+game.play_game()

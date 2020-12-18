@@ -1,0 +1,12 @@
+---
+- !ruby/object:Game
+  guesses: 8
+  secret_word: ashe
+  secret_list:
+  - a
+  - s
+  - h
+  - e
+  word_length: 4
+  word_blanks: 
+  guess_list: 
