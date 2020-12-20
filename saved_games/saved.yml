@@ -1,12 +1,17 @@
 ---
 - !ruby/object:Game
   guesses: 8
-  secret_word: ashe
+  secret_word: noisome
   secret_list:
-  - a
+  - n
+  - o
+  - i
   - s
-  - h
+  - o
+  - m
   - e
-  word_length: 4
-  word_blanks: 
-  guess_list: 
+  word_length: 7
+  word_blanks: _ o i _ o _ _
+  guess_list:
+  - o
+  - i

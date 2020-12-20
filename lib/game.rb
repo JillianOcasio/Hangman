@@ -30,13 +30,11 @@ require_relative './save_game.rb'
     
     
     def game_Display()
-        @secret_word=select_word()
         @secret_word=@secret_word.strip.downcase
         puts @secret_word
         @secret_list=@secret_word.split('')
         @word_length=@secret_list.length
         puts @word_length
-        @secret_list=@secret_word.split('')
         return  create_Board(@word_length)
     end
 
@@ -70,9 +68,13 @@ require_relative './save_game.rb'
         puts "Would you like to open a saved game?"
         response=gets.chomp.downcase
         if response == "yes"|| response == "y"|| response == "Y"
-            open_game()
+            deserialize()
+            @secret_list=@secret_word.split('')
+            @word_length=@secret_list.length
+            word_blanks=@word_blanks
             round_of_guess(word_blanks)
-        else    
+        else
+            @secret_word=select_word()    
             word_blanks=game_Display()
             round_of_guess(word_blanks)
         end  
@@ -87,9 +89,10 @@ require_relative './save_game.rb'
             if guess_letter=="save"
                 puts "The file is saved!"
                 @guesses+=1
+                @word_blanks=word_blanks
                 save_game()
             else 
-                guess_list.push(guess_letter)
+                @guess_list.push(guess_letter)
                 if @secret_list.include?(guess_letter)
                     letter_spots = compare_letter(guess_letter)
                     word_blanks=rearrange_Board(letter_spots, guess_letter, word_blanks)
@@ -106,11 +109,6 @@ require_relative './save_game.rb'
         end
     end 
     end 
-
-    def open_game()
-        deserialize()
-    end 
-
         
     def compare_letter(guess_letter)
         return @secret_list.each_index.select { |index| @secret_list[index] == guess_letter}  
